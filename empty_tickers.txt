@@ -1,0 +1,6 @@
+ASML 10-k
+ASML 10-q
+TEAM 10-k
+TEAM 10-q
+BIDU 10-k
+BIDU 10-q
