@@ -8,7 +8,7 @@ import math
 
 from Downloader import Downloader
 
-dl = Downloader("down")
+dl = Downloader()
 
 yf.pdr_override()
 
