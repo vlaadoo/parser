@@ -251,6 +251,7 @@ def download_filings(
     include_filing_details: bool,
 ) -> None:
     for filing in filings_to_fetch:
+        # print(filings_to_fetch)
         # .txt files with all info in each format
         # try:
         #     download_and_save_filing(
