@@ -7,7 +7,7 @@ import html2text
 from Downloader import Downloader
 
 
-dl = Downloader()   
+dl = Downloader()
 
 h = html2text.HTML2Text()
 h.ignore_links = True
@@ -41,70 +41,92 @@ def get_sp500_tickers():
     return tickers
 
 
+def print_emotions():
+    print("------Emotions of 10K:")
+    print(pd.DataFrame.from_dict(all_emo_10k, orient='index', columns=[
+        'fear',
+        'anger',
+        'trust',
+        'surprise',
+        'positive',
+        'negative',
+        'sadness',
+        'disgust',
+        'joy',
+        'anticipation'
+    ]))
 
-def santiment(tick):
+    print("\n------Emotions of 10Q:")
+    print(pd.DataFrame.from_dict(all_emo_10q, orient='index', columns=[
+        'fear',
+        'anger',
+        'trust',
+        'surprise',
+        'positive',
+        'negative',
+        'sadness',
+        'disgust',
+        'joy',
+        'anticipation'
+    ]))
+
+
+def get_10K_reports(tick):
+    dl.get(report_10k, tick, amount=1)
+
     if os.path.isfile("/Users/vladoo/Work/parser/EDGAR/" + tick + "/" + report_10k + "/filing-details.html"):
-        file_path_10k = "/Users/vladoo/Work/parser/EDGAR/" + tick + "/" + report_10k + "/filing-details.html"
-    else:
-        return
-
-    if os.path.isfile("/Users/vladoo/Work/parser/EDGAR/" + tick + "/" + report_10q + "/filing-details.html"):
-        file_path_10q = "/Users/vladoo/Work/parser/EDGAR/" + tick + "/" + report_10q + "/filing-details.html"
+        file_path_10k = "/Users/vladoo/Work/parser/EDGAR/" + \
+            tick + "/" + report_10k + "/filing-details.html"
     else:
         return
 
     html_10k = open(file_path_10k, "r")
-    html_10q = open(file_path_10q, "r")
-    
+
     print("     Reading 10K for emotions")
     emotions_10k = NRCLex(h.handle(html_10k.read()))
-    print("     Reading 10Q for emotions")
-    emotions_10q = NRCLex(h.handle(html_10q.read()))
-    
+
     print("     Writing 10K emotions")
     all_emo_10k[tick] = emotions_10k.affect_frequencies
+
+
+def get_10Q_reports(tick):
+    dl.get(report_10q, tick, amount=1)
+
+    if os.path.isfile("/Users/vladoo/Work/parser/EDGAR/" + tick + "/" + report_10q + "/filing-details.html"):
+        file_path_10q = "/Users/vladoo/Work/parser/EDGAR/" + \
+            tick + "/" + report_10q + "/filing-details.html"
+    else:
+        return
+
+    html_10q = open(file_path_10q, "r")
+
+    print("     Reading 10Q for emotions")
+    emotions_10q = NRCLex(h.handle(html_10q.read()))
+
     print("     Writing 10Q emotions")
     all_emo_10q[tick] = emotions_10q.affect_frequencies
 
 
-def print_emotions():
-    print("------Emotions of 10K:")
-    print(pd.DataFrame.from_dict(all_emo_10k, orient='index',columns=[
-        'fear', 
-        'anger', 
-        'trust', 
-        'surprise', 
-        'positive', 
-        'negative', 
-        'sadness', 
-        'disgust', 
-        'joy', 
-        'anticipation'
-        ]))    
-
-    print("\n------Emotions of 10Q:")
-    print(pd.DataFrame.from_dict(all_emo_10q, orient='index',columns=[
-        'fear', 
-        'anger', 
-        'trust', 
-        'surprise', 
-        'positive', 
-        'negative', 
-        'sadness', 
-        'disgust', 
-        'joy', 
-        'anticipation'
-        ]))
-
 tickers = get_nasdaq_tickers() + get_sp500_tickers()
 
-for tick in range(len(tickers)):
-    print(tickers[tick])
+start = input(
+    "1) Скачать отчеты годовые и квартальные \n2) Скачать только годовые \n3) Скачать только кварталаьные")
 
-    dl.get(report_10k, tickers[tick], amount=1)
-    dl.get(report_10q, tickers[tick], amount=1)
-    santiment(tickers[tick])
+if start == 1:
+    for tick in range(len(tickers)):
+        print(tickers[tick])
 
+        get_10K_reports(tickers[tick])
+        get_10Q_reports(tickers[tick])
+elif start == 2:
+    for tick in range(len(tickers)):
+        print(tickers[tick])
+
+        get_10K_reports(tickers[tick])
+elif start == 3:
+    for tick in range(len(tickers)):
+        print(tickers[tick])
+
+        get_10Q_reports(tickers[tick])
 
 print_emotions()
-
