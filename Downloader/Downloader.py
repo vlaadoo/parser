@@ -18,36 +18,20 @@ import requests
 
 f = open('empty_tickers.txt', "w")
 
+
 @functools.lru_cache()
 def get_cik_map():
-    """Get dictionary of tickers and company names to CIK numbers.
-
-    Uses ``functools.lru_cache`` to cache response if used in later calls.
-    To clear cache, use ``get_cik_map.cache_clear()``.
-
-    .. note::
-       All company names and tickers are normalized by converting to upper case.
-
-    Returns:
-        Dictionary with keys "ticker" and "title". To get dictionary
-            mapping tickers to CIKs, use "ticker". To get
-            company names mapped to CIKs, use "title".
-
-    .. versionadded:: 0.1.6
-    """
     response = requests.get("https://www.sec.gov/files/company_tickers.json")
     json_response = response.json()
     return {key: {v[key].upper(): str(v["cik_str"]) for v in json_response.values()}
             for key in ("ticker", "title")}
-
-# print(get_cik_map())
 
 
 def get_ciks(cik):
 
     cik_map = get_cik_map()
     lookup = cik
-        # all keys upper case
+    # all keys upper case
     ticker_map = cik_map["ticker"]
     title_map = cik_map["title"]
     zero_count = ""
@@ -82,7 +66,6 @@ class Downloader:
     """
 
     supported_filings: ClassVar[List[str]] = sorted(_SUPPORTED_FILINGS)
-
 
     def __init__(self, download_folder: Union[str, Path, None] = None) -> None:
         """Constructor for the :class:`Downloader` class."""
@@ -161,10 +144,9 @@ class Downloader:
             >>> dl.get("SD", "AAPL")
         """
         ticker_or_cik = str(ticker_or_cik).strip().upper()
-        
+
         ticker_name = str(ticker_or_cik).strip().upper()
         ticker_or_cik = get_ciks(ticker_or_cik)
-
 
         if amount is None:
             # If amount is not specified, obtain all available filings.
@@ -234,10 +216,6 @@ class Downloader:
         if len(filings_to_fetch) == 0:
             f.write(str(ticker_name) + " " + str(filing) + "\n")
             print("!!! " + str(filing) + " doesn't exist")
+
         # Get number of unique accession numbers downloaded
         return get_number_of_unique_filings(filings_to_fetch)
-
-
-
-
-

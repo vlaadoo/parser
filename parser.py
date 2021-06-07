@@ -88,6 +88,7 @@ def check_length(text):
 
 def get_10K_reports_sec(tick):
     if os.path.isfile(path_to_folder_sec + tick + "/" + report_10k + "/filing-details.html"):
+        print("     File exists")
         file_path_10k = path_to_folder_sec + tick + \
             "/" + report_10k + "/filing-details.html"
     else:
@@ -111,6 +112,7 @@ def get_10K_reports_sec(tick):
 
 def get_10Q_reports_sec(tick):
     if os.path.isfile(path_to_folder_sec + tick + "/" + report_10q + "/filing-details.html"):
+        print("     File exists")
         file_path_10q = path_to_folder_sec + tick + \
             "/" + report_10q + "/filing-details.html"
     else:
@@ -134,7 +136,8 @@ def get_10Q_reports_sec(tick):
 
 def get_10K_reports_eu(tick):
     if os.path.isfile(path_to_folder_eu + tick + "/" + report_10k + "/filing-details.pdf"):
-        file_path_10k = path_to_folder_eu + tick + "/" + report_10k + "/filing-details.pdf"
+        file_path_10k = path_to_folder_eu + tick + \
+            "/" + report_10k + "/filing-details.pdf"
     else:
         return
 
@@ -146,7 +149,8 @@ def get_10K_reports_eu(tick):
     with pdfplumber.open(file_path_10k) as pdf_10k:
         for page in range(len(pdf_10k.pages)):
             if pdf_10k.pages[page].extract_text() != None:
-                pdf_10k_text = pdf_10k_text + "\n" + pdf_10k.pages[page].extract_text()
+                pdf_10k_text = pdf_10k_text + "\n" + \
+                    pdf_10k.pages[page].extract_text()
 
     pdf_10k.close()
 
@@ -159,7 +163,8 @@ def get_10K_reports_eu(tick):
 
 def get_10Q_reports_eu(tick):
     if os.path.isfile(path_to_folder_eu + tick + "/" + report_10q + "/filing-details.pdf"):
-        file_path_10q = path_to_folder_eu + tick + "/" + report_10q + "/filing-details.pdf"
+        file_path_10q = path_to_folder_eu + tick + \
+            "/" + report_10q + "/filing-details.pdf"
     else:
         return
 
@@ -171,7 +176,8 @@ def get_10Q_reports_eu(tick):
     with pdfplumber.open(file_path_10q) as pdf_10q:
         for page in range(len(pdf_10q.pages)):
             if pdf_10q.pages[page].extract_text() != None:
-                pdf_10q_text = pdf_10q_text + "\n" + pdf_10q.pages[page].extract_text()
+                pdf_10q_text = pdf_10q_text + "\n" + \
+                    pdf_10q.pages[page].extract_text()
 
     pdf_10q.close()
 
@@ -182,52 +188,55 @@ def get_10Q_reports_eu(tick):
     all_emo_10q[tick] = emotions_10q.affect_frequencies
 # ——————————MAIN—————————————
 
-tickers_sec = get_nasdaq_tickers() + get_sp500_tickers()
-tickers_eu = get_tickers_E()
+
+tickers_sec = list(set(get_nasdaq_tickers() + get_sp500_tickers()))
+tickers_eu = list(set(get_tickers_E()))
+
 
 start = input(
-    '''
-    Отчеты с сайта sev.gov:
+    '''    Отчеты с сайта sev.gov:
 1) Скачать отчеты годовые и квартальные\n2) Скачать только годовые \n3) Скачать только кварталаьные\n
     Европейские отчеты:
 4) Оценка годовых и квартальных отчетов\n5) Оценка только годовых \n6) Оценка только квартальных
 \nВыберите вариант: ''')
-
+n = 1
 if start == "1":
-    n = 1
     for tick in range(len(tickers_sec)):
-        print(str(n) + '/' + str(len(tickers_sec)))
+        print(str(n) + "/" + str(len(tickers_sec)) + " " + tickers_sec[tick])
         n += 1
-        print(tickers_sec[tick])
 
         get_10K_reports_sec(tickers_sec[tick])
         get_10Q_reports_sec(tickers_sec[tick])
 elif start == "2":
     for tick in range(len(tickers_sec)):
-        print(tickers_sec[tick])
+        print(str(n) + "/" + str(len(tickers_sec)) + " " + tickers_sec[tick])
+        n += 1
 
         get_10K_reports_sec(tickers_sec[tick])
 elif start == "3":
     for tick in range(len(tickers_sec)):
-        print(tickers_sec[tick])
+        print(str(n) + "/" + str(len(tickers_sec)) + " " + tickers_sec[tick])
+        n += 1
 
         get_10Q_reports_sec(tickers_sec[tick])
 elif start == "4":
     for tick in range(len(tickers_eu)):
-        print(tickers_eu[tick])
+        print(str(n) + "/" + str(len(tickers_eu)) + " " + tickers_eu[tick])
+        n += 1
 
         get_10K_reports_eu(tickers_eu[tick])
         get_10Q_reports_eu(tickers_eu[tick])
 elif start == "5":
     for tick in range(len(tickers_eu)):
-        print(tickers_eu[tick])
+        print(str(n) + "/" + str(len(tickers_eu)) + " " + tickers_eu[tick])
+        n += 1
 
         get_10K_reports_eu(tickers_eu[tick])
 elif start == "6":
     for tick in range(len(tickers_eu)):
-        print(tickers_eu[tick])
+        print(str(n) + "/" + str(len(tickers_eu)) + " " + tickers_eu[tick])
+        n += 1
 
         get_10Q_reports_eu(tickers_eu[tick])
 
 print_emotions()
-
